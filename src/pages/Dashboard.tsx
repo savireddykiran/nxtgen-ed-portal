@@ -7,11 +7,12 @@ import { toast } from "sonner";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
+  const [role, setRole] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in
+    // Check if user is logged in and fetch their role
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -21,6 +22,15 @@ const Dashboard = () => {
       }
 
       setUser(session.user);
+      
+      // Fetch user role from database
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .single();
+      
+      setRole(roleData?.role || "student");
       setLoading(false);
     };
 
@@ -51,8 +61,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
-  const role = user?.user_metadata?.role || "student";
 
   return (
     <div className="min-h-screen bg-background">

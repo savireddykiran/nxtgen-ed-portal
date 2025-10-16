@@ -6,6 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Courses from "./pages/Courses";
+import MyCourses from "./pages/MyCourses";
+import CreateCourse from "./pages/CreateCourse";
+import CourseDetail from "./pages/CourseDetail";
+import CreateAssignment from "./pages/CreateAssignment";
+import AssignmentDetail from "./pages/AssignmentDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +26,12 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/my-courses" element={<MyCourses />} />
+          <Route path="/create-course" element={<CreateCourse />} />
+          <Route path="/course/:id" element={<CourseDetail />} />
+          <Route path="/course/:courseId/create-assignment" element={<CreateAssignment />} />
+          <Route path="/assignment/:id" element={<AssignmentDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

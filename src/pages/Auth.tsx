@@ -35,16 +35,18 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               role: role,
+              full_name: email.split('@')[0]
             },
           },
         });
 
         if (error) throw error;
 
-        toast.success("Account created! Please check your email to verify.");
+        toast.success("Account created successfully!");
+        setIsLogin(true);
       }
     } catch (error: any) {
       toast.error(error.message || "An error occurred");

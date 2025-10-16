@@ -70,10 +70,25 @@ const Dashboard = () => {
             <GraduationCap className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold">Nxtgen LMS</span>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => navigate("/courses")}>
+              View Courses
+            </Button>
+            {role === "student" && (
+              <Button variant="outline" onClick={() => navigate("/my-courses")}>
+                My Courses
+              </Button>
+            )}
+            {role === "teacher" && (
+              <Button onClick={() => navigate("/create-course")}>
+                Create Course
+              </Button>
+            )}
+            <Button variant="ghost" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </nav>
 
@@ -89,12 +104,18 @@ const Dashboard = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="gradient-card p-6 rounded-2xl border border-border">
-              <h2 className="text-xl font-bold mb-4">Dashboard Coming Soon</h2>
-              <p className="text-muted-foreground">
-                Your personalized {role} dashboard will be available in Phase 2.
-                Stay tuned for exciting features!
+            <div className="gradient-card p-6 rounded-2xl border border-border cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/courses")}>
+              <h2 className="text-xl font-bold mb-4">
+                {role === "teacher" ? "Manage Courses" : "Browse Courses"}
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                {role === "teacher" 
+                  ? "Create and manage your courses, assignments, and track student progress."
+                  : "Browse available courses, submit assignments, and track your grades."}
               </p>
+              <Button className="w-full">
+                {role === "teacher" ? "View All Courses" : "Browse Courses"}
+              </Button>
             </div>
 
             <div className="gradient-card p-6 rounded-2xl border border-border">

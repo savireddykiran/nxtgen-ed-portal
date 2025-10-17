@@ -2,57 +2,124 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, LogOut } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { BookOpen, FileText, Users, Award } from "lucide-react";
 import { toast } from "sonner";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { TopNav } from "@/components/TopNav";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    courses: 0,
+    assignments: 0,
+    students: 0,
+    avgGrade: 0,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in and fetch their role
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-
-      setUser(session.user);
-      
-      // Fetch user role from database
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id)
-        .single();
-      
-      setRole(roleData?.role || "student");
-      setLoading(false);
-    };
-
     checkUser();
+    fetchStats();
+  }, []);
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") {
-        navigate("/auth");
-      } else if (session) {
-        setUser(session.user);
-      }
-    });
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate("/auth");
+      return;
+    }
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    setUser(session.user);
+    
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .single();
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast.success("Signed out successfully");
-    navigate("/");
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", session.user.id)
+      .single();
+    
+    setRole(roleData?.role || "student");
+    setUserName(profile?.full_name || "User");
+    setLoading(false);
   };
+
+  const fetchStats = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (roleData?.role === "teacher") {
+      const { data: coursesData } = await supabase
+        .from("courses")
+        .select("id")
+        .eq("teacher_id", session.user.id);
+
+      const { data: assignmentsData } = await supabase
+        .from("assignments")
+        .select("id, course_id")
+        .in("course_id", coursesData?.map(c => c.id) || []);
+
+      const { data: enrollmentsData } = await supabase
+        .from("enrollments")
+        .select("id")
+        .in("course_id", coursesData?.map(c => c.id) || []);
+
+      setStats({
+        courses: coursesData?.length || 0,
+        assignments: assignmentsData?.length || 0,
+        students: enrollmentsData?.length || 0,
+        avgGrade: 0,
+      });
+    } else {
+      const { data: enrollmentsData } = await supabase
+        .from("enrollments")
+        .select("course_id")
+        .eq("student_id", session.user.id);
+
+      const { data: submissionsData } = await supabase
+        .from("submissions")
+        .select(`
+          id,
+          assignment_id,
+          assignments(course_id)
+        `)
+        .eq("student_id", session.user.id);
+
+      const { data: gradesData } = await supabase
+        .from("grades")
+        .select("grade, submission_id")
+        .in("submission_id", submissionsData?.map(s => s.id) || []);
+
+      const avgGrade = gradesData && gradesData.length > 0
+        ? gradesData.reduce((acc, g) => acc + (Number(g.grade) || 0), 0) / gradesData.length
+        : 0;
+
+      setStats({
+        courses: enrollmentsData?.length || 0,
+        assignments: submissionsData?.length || 0,
+        students: 0,
+        avgGrade: Math.round(avgGrade),
+      });
+    }
+  };
+
+
 
   if (loading) {
     return (
@@ -63,76 +130,134 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <nav className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <GraduationCap className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">Nxtgen LMS</span>
-          </div>
-          <div className="flex gap-4">
-            <Button variant="outline" onClick={() => navigate("/courses")}>
-              View Courses
-            </Button>
-            {role === "student" && (
-              <Button variant="outline" onClick={() => navigate("/my-courses")}>
-                My Courses
-              </Button>
-            )}
-            {role === "teacher" && (
-              <Button onClick={() => navigate("/create-course")}>
-                Create Course
-              </Button>
-            )}
-            <Button variant="ghost" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </nav>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar role={role} />
+        <div className="flex-1 flex flex-col">
+          <TopNav userName={userName} role={role} />
+          
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto px-4 py-12">
+              <div className="max-w-6xl mx-auto">
+                <h1 className="text-3xl font-bold mb-8">Dashboard Overview</h1>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="gradient-card p-8 rounded-2xl border border-border mb-8">
-            <h1 className="text-3xl font-bold mb-2">
-              Welcome, {role.charAt(0).toUpperCase() + role.slice(1)}!
-            </h1>
-            <p className="text-muted-foreground">
-              Email: {user?.email}
-            </p>
-          </div>
+                <div className="grid md:grid-cols-4 gap-6 mb-8">
+                  <Card className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-primary/10">
+                        <BookOpen className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          {role === "teacher" ? "My Courses" : "Enrolled"}
+                        </p>
+                        <p className="text-2xl font-bold">{stats.courses}</p>
+                      </div>
+                    </div>
+                  </Card>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="gradient-card p-6 rounded-2xl border border-border cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate("/courses")}>
-              <h2 className="text-xl font-bold mb-4">
-                {role === "teacher" ? "Manage Courses" : "Browse Courses"}
-              </h2>
-              <p className="text-muted-foreground mb-4">
-                {role === "teacher" 
-                  ? "Create and manage your courses, assignments, and track student progress."
-                  : "Browse available courses, submit assignments, and track your grades."}
-              </p>
-              <Button className="w-full">
-                {role === "teacher" ? "View All Courses" : "Browse Courses"}
-              </Button>
-            </div>
+                  <Card className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-secondary/10">
+                        <FileText className="h-6 w-6 text-secondary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          {role === "teacher" ? "Assignments" : "Submitted"}
+                        </p>
+                        <p className="text-2xl font-bold">{stats.assignments}</p>
+                      </div>
+                    </div>
+                  </Card>
 
-            <div className="gradient-card p-6 rounded-2xl border border-border">
-              <h2 className="text-xl font-bold mb-4">Your Role</h2>
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
-                role === "teacher" 
-                  ? "bg-secondary/10 text-secondary border border-secondary/20" 
-                  : "bg-primary/10 text-primary border border-primary/20"
-              }`}>
-                {role === "teacher" ? <GraduationCap className="h-5 w-5" /> : null}
-                <span className="font-semibold capitalize">{role}</span>
+                  {role === "teacher" && (
+                    <Card className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-lg bg-accent/10">
+                          <Users className="h-6 w-6 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Total Students</p>
+                          <p className="text-2xl font-bold">{stats.students}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+
+                  {role === "student" && (
+                    <Card className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-lg bg-accent/10">
+                          <Award className="h-6 w-6 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Avg Grade</p>
+                          <p className="text-2xl font-bold">{stats.avgGrade}%</p>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <Card className="p-6">
+                    <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+                    <div className="space-y-3">
+                      <Button
+                        className="w-full justify-start"
+                        variant="outline"
+                        onClick={() => navigate("/courses")}
+                      >
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        {role === "teacher" ? "Manage Courses" : "Browse Courses"}
+                      </Button>
+                      {role === "teacher" && (
+                        <Button
+                          className="w-full justify-start"
+                          variant="outline"
+                          onClick={() => navigate("/create-course")}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Create New Course
+                        </Button>
+                      )}
+                      {role === "student" && (
+                        <Button
+                          className="w-full justify-start"
+                          variant="outline"
+                          onClick={() => navigate("/my-courses")}
+                        >
+                          <Award className="h-4 w-4 mr-2" />
+                          View My Grades
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+
+                  <Card className="p-6">
+                    <h2 className="text-xl font-bold mb-4">Account Info</h2>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Name</p>
+                        <p className="font-medium">{userName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Email</p>
+                        <p className="font-medium">{user?.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Role</p>
+                        <p className="font-medium capitalize">{role}</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
               </div>
             </div>
-          </div>
+          </main>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

@@ -12,6 +12,7 @@ import CreateCourse from "./pages/CreateCourse";
 import CourseDetail from "./pages/CourseDetail";
 import CreateAssignment from "./pages/CreateAssignment";
 import AssignmentDetail from "./pages/AssignmentDetail";
+import Discussions from "./pages/Discussions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/course/:courseId/create-assignment" element={<CreateAssignment />} />
           <Route path="/assignment/:id" element={<AssignmentDetail />} />
+          <Route path="/discussions" element={<Discussions />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

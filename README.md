@@ -2,60 +2,69 @@
 
 ## 🎓 Overview
 
-Nxtgen LMS is a comprehensive Learning Management System designed to revolutionize the educational experience for both students and teachers. Built with modern web technologies, it provides an intuitive platform for managing learning, attendance, and communication in a structured and interactive way.
+Nxtgen LMS is a comprehensive, full-featured Learning Management System designed to revolutionize the educational experience for both students and teachers. Built with modern web technologies and Lovable Cloud (Supabase), it provides an intuitive platform for course management, assignments, grading, and interactive discussions.
 
 **Live URL**: [Visit Nxtgen LMS](https://lovable.dev/projects/8d897a6e-73bd-45cd-bd98-52edf50381a5)
 
 ---
 
-## ✨ Features (Phase 1)
+## ✨ Core Features
 
-### 🏠 Landing Page
-- **Hero Section**: Eye-catching introduction with call-to-action buttons
-- **About Section**: Platform purpose and key benefits
-- **How It Works**: Step-by-step user journey explanation
-- **Features Showcase**: Comprehensive feature cards with hover effects
-- **Team Section**: Meet the development team
-- **Contact Form**: Easy communication channel
+### 🧑‍🏫 For Teachers
+- **Dashboard Overview**: View statistics for courses, assignments, and enrolled students
+- **Course Management**: Create, edit, delete, and manage courses
+- **Assignment Management**: Create assignments, view submissions, and grade students
+- **Student Management**: View enrolled students per course
+- **Material Upload**: Upload course materials (PDF, PPT, etc.)
+- **Discussion Forum**: Start and participate in course discussions
+- **Grade Management**: Grade assignments and track student performance
 
-### 🔐 Authentication System
-- Email-based registration and login
-- Role-based access (Student/Teacher)
-- Secure password handling
-- Auto-confirm email for faster testing
-- Protected dashboard routes
+### 🧑‍🎓 For Students
+- **Dashboard Overview**: View enrolled courses, submitted assignments, and average grades
+- **Course Enrollment**: Browse and enroll in available courses
+- **Assignment Submission**: Submit assignments with file uploads
+- **Grade Tracking**: View grades and performance metrics across courses
+- **Course Materials**: Access and download uploaded course materials
+- **Discussion Forum**: Participate in course discussions and Q&A
+
+### 🏠 Common Features
+- **Role-Based Sidebar Navigation**: Intuitive collapsible navigation based on user role
+- **Top Navigation Bar**: Quick access to discussions with user greeting
+- **Real-time Updates**: Instant updates across the platform
+- **Secure Authentication**: Email/password authentication with automatic profile creation
+- **Responsive Design**: Seamless experience on desktop, tablet, and mobile
+- **Discussion Forum**: Course-based discussions with threaded replies
 
 ### 🎨 Design Features
-- **Full Dark Mode Theme**: Professional dark interface
-- **Vibrant Color Scheme**: 
-  - Blue (#3B82F6) - Primary actions
-  - Green (#10B981) - Success states
-  - Orange (#F97316) - Accent elements
-- **Smooth Animations**: Fade-in, scale, and hover effects
-- **Glowing Card Effects**: Dynamic visual feedback
-- **Fully Responsive**: Mobile, tablet, and desktop optimized
+- **Modern Dark Theme**: Professional dark interface with vibrant accents
+- **Semantic Color System**: HSL-based design tokens for consistency
+- **Smooth Animations**: Fade-in, scale, and hover effects throughout
+- **Glowing Effects**: Dynamic visual feedback on interactive elements
+- **Fully Responsive**: Mobile-first design that scales beautifully
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Frontend
-- **Framework**: React 18.3.1
-- **Build Tool**: Vite
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 3.x
-- **UI Components**: Shadcn/ui
-- **Icons**: Lucide React
+- **Framework**: React 18.3.1 with TypeScript
+- **Build Tool**: Vite - Lightning-fast build and HMR
+- **Styling**: Tailwind CSS with semantic design tokens
+- **UI Components**: Shadcn/ui - Accessible and customizable
+- **Icons**: Lucide React - Beautiful icon system
 - **Routing**: React Router DOM 6.x
 - **Forms**: React Hook Form + Zod validation
-- **Animations**: Custom Tailwind animations
-- **Toasts**: Sonner
+- **State Management**: TanStack Query for server state
+- **Toasts**: Sonner for beautiful notifications
+- **Date Utilities**: date-fns
+- **Charts**: Recharts for data visualization
 
-### Backend (Lovable Cloud)
-- **Database**: PostgreSQL (Supabase)
-- **Authentication**: Supabase Auth
-- **Real-time**: Supabase Realtime
-- **Storage**: Supabase Storage (ready for Phase 2)
+### Backend (Lovable Cloud - Supabase)
+- **Database**: PostgreSQL with Row Level Security (RLS)
+- **Authentication**: Supabase Auth with email/password
+- **File Storage**: Supabase Storage for assignments and materials
+- **Real-time**: Supabase Realtime for live updates
+- **Edge Functions**: Serverless functions (ready for AI features)
 
 ### Development Tools
 - **Package Manager**: npm
@@ -70,8 +79,10 @@ Nxtgen LMS is a comprehensive Learning Management System designed to revolutioni
 /Nxtgen-LMS
 ├── src/
 │   ├── components/          # Reusable UI components
-│   │   ├── ui/             # Shadcn UI components
-│   │   ├── Navbar.tsx      # Navigation bar
+│   │   ├── ui/             # Shadcn UI components (sidebar, cards, buttons, etc.)
+│   │   ├── AppSidebar.tsx  # Role-based sidebar navigation
+│   │   ├── TopNav.tsx      # Top navigation bar with greeting
+│   │   ├── Navbar.tsx      # Landing page navbar
 │   │   ├── Hero.tsx        # Landing hero section
 │   │   ├── About.tsx       # About section
 │   │   ├── HowItWorks.tsx  # How it works section
@@ -82,16 +93,26 @@ Nxtgen LMS is a comprehensive Learning Management System designed to revolutioni
 │   ├── pages/              # Page components
 │   │   ├── Index.tsx       # Landing page
 │   │   ├── Auth.tsx        # Login/Register page
-│   │   ├── Dashboard.tsx   # User dashboard
+│   │   ├── Dashboard.tsx   # Role-based dashboard with stats
+│   │   ├── Courses.tsx     # Browse and manage courses
+│   │   ├── MyCourses.tsx   # Student's enrolled courses
+│   │   ├── CreateCourse.tsx # Teacher course creation
+│   │   ├── CourseDetail.tsx # Course details with tabs
+│   │   ├── CreateAssignment.tsx # Assignment creation
+│   │   ├── AssignmentDetail.tsx # Assignment details and submission
+│   │   ├── Discussions.tsx  # Discussion forum
 │   │   └── NotFound.tsx    # 404 page
 │   ├── integrations/       # External integrations
-│   │   └── supabase/       # Supabase client & types
+│   │   └── supabase/       # Supabase client & auto-generated types
 │   ├── hooks/              # Custom React hooks
 │   ├── lib/                # Utility functions
 │   ├── assets/             # Images and static files
-│   ├── App.tsx             # Main app component
+│   ├── App.tsx             # Main app component with routing
 │   ├── main.tsx            # App entry point
 │   └── index.css           # Global styles & design system
+├── supabase/               # Supabase configuration
+│   ├── migrations/         # Database migration files
+│   └── config.toml         # Supabase project configuration
 ├── public/                 # Public assets
 ├── index.html              # HTML template
 ├── tailwind.config.ts      # Tailwind configuration
@@ -144,49 +165,178 @@ The production build will be in the `dist/` folder.
 
 ## 🎯 Usage Guide
 
+### Getting Started
+
+1. **Sign Up**:
+   - Click "Get Started" on the landing page
+   - Choose your role (Student or Teacher)
+   - Enter your email and password
+   - Profile is created automatically
+
+2. **Login**:
+   - Use your email and password
+   - Auto-redirected to role-based dashboard
+
 ### For Students
-1. Click "Get Started" on the landing page
-2. Select "Sign Up" and choose "Student" role
-3. Enter your email and password
-4. Access your student dashboard after login
+
+**Dashboard**:
+- View enrolled courses count
+- See submitted assignments
+- Track average grade across courses
+
+**Courses**:
+- Browse available courses
+- Enroll in courses
+- Access course materials
+- View assignments
+
+**Assignments**:
+- Submit assignments with file uploads
+- View teacher feedback
+- Check grades
+
+**Discussions**:
+- Participate in course discussions
+- Ask questions and share insights
 
 ### For Teachers
-1. Click "Get Started" on the landing page
-2. Select "Sign Up" and choose "Teacher" role
-3. Enter your email and password
-4. Access your teacher dashboard after login
+
+**Dashboard**:
+- View total courses created
+- See total assignments
+- Track enrolled students count
+
+**Course Management**:
+- Create new courses with title, description, duration
+- Upload course materials (PDF, PPT, etc.)
+- View enrolled students
+- Manage course content
+
+**Assignments**:
+- Create assignments for specific courses
+- View student submissions
+- Grade submissions with feedback
+- Track submission status
+
+**Discussions**:
+- Start discussion threads
+- Reply to student questions
+- Moderate course forums
 
 ### Navigation
-- Use the navbar to scroll to different sections
-- All sections have smooth scroll behavior
-- Mobile-friendly hamburger menu for smaller screens
+
+- **Sidebar**: Collapsible navigation menu (role-based)
+- **Top Bar**: User greeting and quick discussion access
+- **Responsive**: Works on all devices
 
 ---
 
-## 🔮 Future Plans (Phase 2)
+## 🗄️ Database Schema
 
-### Role-Based Dashboards
-- **Student Dashboard**:
-  - View enrolled courses
-  - Submit assignments
-  - Track attendance
-  - Check grades and progress
-  
-- **Teacher Dashboard**:
-  - Create and manage courses
-  - Grade assignments
-  - Mark attendance
-  - Communicate with students
+The application uses PostgreSQL with the following tables:
 
-### Additional Features
-- Real-time notifications using Supabase Realtime
-- File upload and management (assignments, materials)
-- Email notifications for important events
-- Video conferencing integration
-- Advanced analytics and reporting
-- Calendar integration
-- Discussion forums
-- Quiz and assessment tools
+- **profiles** - User profile information (full_name, created_at)
+- **user_roles** - User role assignment (student/teacher) with enum type
+- **courses** - Course information (title, description, duration, teacher_id)
+- **enrollments** - Student course enrollments (student_id, course_id)
+- **assignments** - Course assignments (title, description, due_date, course_id)
+- **submissions** - Student assignment submissions (student_id, assignment_id, file_url, content)
+- **grades** - Assignment grades (submission_id, grade, feedback, graded_by)
+- **course_materials** - Uploaded materials (course_id, title, file_url, file_type)
+- **discussion_posts** - Forum discussions (user_id, course_id, content, parent_id)
+
+**Storage Buckets**:
+- `assignment-submissions` (private) - Student assignment files
+- `course-materials` (public) - Teacher uploaded materials
+
+All tables have comprehensive Row Level Security (RLS) policies to ensure data security and proper access control.
+
+## 🔄 Changing the Database
+
+### Using Your Own Supabase Project
+
+If you want to use your own Supabase project instead of Lovable Cloud:
+
+1. **Create a Supabase Project**:
+   - Go to [supabase.com](https://supabase.com) and create a new project
+   - Note your project URL and anon key
+
+2. **Update Environment Variables**:
+   ```bash
+   # Update .env file
+   VITE_SUPABASE_URL=your_project_url
+   VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key
+   ```
+
+3. **Run Database Migrations**:
+   - Copy all SQL from `supabase/migrations/` folder
+   - Run them in order in your Supabase SQL editor
+   - This creates all tables, RLS policies, functions, and triggers
+
+4. **Set Up Storage Buckets**:
+   ```sql
+   -- Create buckets
+   INSERT INTO storage.buckets (id, name, public)
+   VALUES 
+     ('assignment-submissions', 'assignment-submissions', false),
+     ('course-materials', 'course-materials', true);
+   ```
+
+5. **Apply Storage RLS Policies**:
+   - Copy storage policies from migration files
+   - Apply in Supabase SQL editor
+
+6. **Configure Authentication**:
+   - Enable email authentication in Supabase dashboard
+   - Configure email templates (optional)
+   - Set up redirect URLs
+
+### Using a Different Backend (Firebase, MongoDB, etc.)
+
+To use a completely different backend:
+
+1. **Replace Database Client**:
+   - Remove `src/integrations/supabase/`
+   - Create your own database client/SDK
+   - Update all imports across the app
+
+2. **Implement Database Schema**:
+   - Create equivalent tables/collections
+   - Implement security rules (equivalent to RLS)
+   - Set up indexes for performance
+
+3. **Replace Authentication**:
+   - Update `src/pages/Auth.tsx`
+   - Replace all `supabase.auth` calls
+   - Implement session management
+
+4. **Replace File Storage**:
+   - Update file upload in:
+     - `src/pages/CreateCourse.tsx`
+     - `src/pages/AssignmentDetail.tsx`
+   - Implement your storage provider
+
+5. **Replace Real-time (Optional)**:
+   - Remove Supabase real-time subscriptions
+   - Implement WebSockets, polling, or your provider's solution
+
+6. **Update All Queries**:
+   - Replace all `supabase.from()` calls
+   - Implement equivalent query methods
+   - Handle error responses differently
+
+## 🔮 Future Enhancements
+
+### Planned Features
+- **Attendance System**: Mark and track student attendance
+- **AI Guidance**: Personalized AI assistant for students and teachers
+- **Notifications**: Real-time push notifications for updates
+- **Advanced Analytics**: Performance charts and insights
+- **Calendar Integration**: Course schedule and deadline management
+- **Quiz System**: Create and take quizzes with auto-grading
+- **Video Integration**: Embed video lectures
+- **Email Notifications**: Important event notifications
+- **Mobile App**: Native iOS and Android apps
 
 ---
 
@@ -249,10 +399,54 @@ This project is proprietary software developed by the Nxtgen LMS team.
 
 ---
 
-## 🐛 Known Issues
+## 🚢 Deployment
 
-- Email verification is auto-confirmed in development mode for faster testing
-- Dashboard features are placeholders pending Phase 2 implementation
+### Deploy with Lovable (Recommended)
+
+The easiest way to deploy:
+1. Click the "Publish" button in Lovable editor
+2. Your app is deployed automatically with backend included
+3. Get a production URL instantly
+
+### Deploy Manually
+
+Build for production:
+```bash
+npm run build
+```
+
+Deploy the `dist/` folder to:
+- **Vercel**: `vercel --prod`
+- **Netlify**: Drag & drop `dist/` folder
+- **GitHub Pages**: Push `dist/` to gh-pages branch
+- **Any static host**: Upload `dist/` contents
+
+**Important**: Set environment variables in your hosting provider:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Build Errors**:
+- Clear node_modules: `rm -rf node_modules && npm install`
+- Clear build cache: `rm -rf dist .vite`
+
+**Authentication Issues**:
+- Check Supabase project is active
+- Verify environment variables
+- Check browser console for errors
+
+**File Upload Issues**:
+- Verify storage buckets exist
+- Check RLS policies on storage
+- Ensure file size is within limits
+
+**Database Issues**:
+- Verify migrations ran successfully
+- Check RLS policies are correct
+- Ensure user has proper role assigned
 
 ---
 
